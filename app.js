@@ -28,7 +28,7 @@ server.get((req,res,next)=>{
 
 
 
-const port = process.env.port
+const port = process.env.PORT
 
 const start= async()=>{
     try {

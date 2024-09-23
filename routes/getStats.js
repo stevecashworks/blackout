@@ -4,7 +4,7 @@ import ticketModel from "../models/tickets.js"
 const getStats=async(req,res,next)=>{
 try{
     const allUsers=  await userModel.find()
-    const allTickets=  await ticketModel.find()
+    const allTickets=  await ticketModel.find().populate("user")
 
     return res.status(200).json({
         success:true,

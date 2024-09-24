@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Tickets</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Make sure buttons are not too big on smaller screens */
+    .table td button {
+      margin-right: 5px;
+    }
+
+    /* Adjust table width for smaller screens */
+    @media (max-width: 576px) {
+      .table th, .table td {
+        font-size: 14px;
+      }
+      .table td button {
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Pending Tickets</h2>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="table-primary">
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">Package</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+              </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Bootstrap JS (for proper styling and components) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./grantTicket.js"></script>
+<script>
+    const tbody=document.getElementById("tbody")
+    fetch("https://blackout-65jo.onrender.com/withnotickets")
+    .then(res=>res.json())
+    .then(data=>{
+      console.log(data)
+        if(data.success){
+            data.result.forEach(user=>{
+                const row= document.createElement("tr")
+                const usernameCon=document.createElement("td")
+                const packageCon=document.createElement("td")
+                const actionCon=document.createElement("td")
+                const btn=document.createElement("button")
+                btn.setAttribute("class", "btn btn-success")
+                btn.onclick=()=>{
+                    grantTicket(user._id)
+                }
+                usernameCon.innerHTML=user.userName
+                packageCon.innerHTML="All access"
+                btn.innerHTML="Grant ticket"
+                actionCon.appendChild(btn)
+                row.appendChild(usernameCon)
+                row.appendChild(packageCon)
+                row.appendChild(actionCon)
+                tbody.appendChild(row)
+
+
+            })
+                
+        }
+        else{
+            alert("Failed to fetch data")
+        }
+    })
+
+</script>
+</body>
+</html>

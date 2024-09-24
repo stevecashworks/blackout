@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Tickets</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Make sure buttons are not too big on smaller screens */
+    .table td button {
+      margin-right: 5px;
+    }
+
+    /* Adjust table width for smaller screens */
+    @media (max-width: 576px) {
+      .table th, .table td {
+        font-size: 14px;
+      }
+      .table td button {
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">All Users <span id="noOfUsers"></span></h2>
+  <div class="mb-4">
+
+    <label for="usersFilter"><strong>Filter:</strong></label>
+    <select name="" id="usersFilter">
+      <option value="all">All</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+      <option value="ticket">With Ticket</option>
+      <option value="noTicket">No Ticket</option>
+     </select>
+   </div>
+ 
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="table-primary">
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">Gender</th>
+          <th scope="col">hasTicket</th>
+        </tr>
+      </thead>
+      <tbody id="usersTbody">
+              </tbody>
+    </table>
+  </div>
+  <div  class="paginationCon d-flex mt-4 " style=" height:70px;align-items:  center;justify-content: flex-end;gap:20px;">
+    <p type="button" class="btn btn-outline-primary" id="usersPrevPageBtn">Prev</p>
+    <div class="form-control  text-center" id="usersPageNo" style="width:40px">1</div>
+    <p type="button" id="usersNextPageBtn" class="btn btn-outline-primary">Next</p>
+  </div>
+</div>
+
+
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">All Tickets <span id="noOfTickets"></span></h2>
+ 
+    <div class="mb-4">
+  <label for="ticketsFilter" ><strong>Filter: </strong> </label>
+  <select id="ticketsFilter">
+    <option value="all">All</option>
+    <option value="allAccess">All Access</option>
+    <option value="exclusive">Exclusive</option>
+    <option value="special">Special seat reservation</option>
+  </select>
+      </div>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Package</th>
+            <th scope="col">Number</th>
+          </tr>
+        </thead>
+        <tbody id="ticketsTbody">
+                </tbody>
+      </table>
+    </div>
+    <div  class="paginationCon d-flex mt-4 " style=" height:70px;align-items:  center;justify-content: flex-end;gap:20px;">
+      <p type="button" class="btn btn-outline-primary" id="ticketsPrevPageBtn">Prev</p>
+      <div class="form-control text-center" id="ticketsPageNo" style="width:40px">1</div>
+      <p type="button" class="btn btn-outline-primary" id="ticketsNextPageBtn">Next</p>
+    </div>
+  </div>
+  </div>
+
+
+
+<!-- Bootstrap JS (for proper styling and components) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./grantTicket.js"></script>
+<script>
+  let currentUsersPage=1;
+  let currentTicketsPage=1;
+  const usersPrevPageBtn=document.getElementById("usersPrevPageBtn")
+  const ticketsPrevPageBtn=document.getElementById("ticketsPrevPageBtn")
+  const itemsPerPage=15;
+  const usersNextPageBtn=document.getElementById("usersNextPageBtn")
+  const ticketsNextPageBtn=document.getElementById("ticketsNextPageBtn")
+  const usersPageNo=document.getElementById("usersPageNo")
+  const ticketsPageNo=document.getElementById("ticketsPageNo")
+  
+   const paginate=(list,page)=>{
+    const start= (page-1)*itemsPerPage
+    const end= page*itemsPerPage
+    
+    return list.slice(start,end)
+    
+  }
+    const usersTbody=document.getElementById("usersTbody")
+    const ticketsTbody=document.getElementById("ticketsTbody")
+    const noOfTickets=document.getElementById("noOfTickets")
+    const noOfUsers=document.getElementById("noOfUsers")
+    fetch("https://blackout-65jo.onrender.com/stats")
+    .then(res=>res.json())
+    .then(data=>{
+      
+      if(data.success){
+        const {allUsers, allTickets}= data.result
+        noOfTickets.innerHTML=`(${allTickets.length})`
+        noOfUsers.innerHTML=`(${allUsers.length})`
+        const hasTicket=(x)=>x.ticket?"Yes":"No"
+
+
+        const usersFilterFunctions={
+      "all":(x)=>true,
+      "male":(x)=>x.gender==="male",
+      "female":(x)=>x.gender==="female",
+      "ticket":(x)=>Boolean(x.ticket),
+      "noTicket":(x)=>!(Boolean(x.ticket)),
+
+    }
+    const ticketFilterFunctions={
+      "all":(x)=>true,
+      "allAccess":(x)=>x.plan==="allAccess",
+      "exclusive":(x)=>x.plan==="exclusive",
+      "special":(x)=>x.plan==="special",
+
+
+    }
+    let  usersFilter=document.getElementById("usersFilter")
+    let  ticketsFilter=document.getElementById("ticketsFilter")
+    let usersFilteredList=allUsers.filter(usersFilterFunctions[usersFilter.value]);
+    let ticketsFilteredList= allTickets.filter(ticketFilterFunctions[ticketsFilter.value]);
+  
+
+
+
+ 
+ 
+    const populateUsersList=(list)=>{
+      usersTbody.innerHTML=""
+      list.forEach(user=>{
+        const row= document.createElement("tr")
+        const  userName= document.createElement("td")
+        const  gender= document.createElement("td")
+        const  userHasTicket= document.createElement("td")
+        userName.innerHTML=user.userName;
+        gender.innerHTML=user.gender
+        userHasTicket.innerHTML=hasTicket(user)
+        row.appendChild(userName)
+        row.appendChild(gender)
+        row.appendChild(userHasTicket)
+        usersTbody.appendChild(row)
+      })
+     }
+     const populateTicketsList=(list)=>{
+      ticketsTbody.innerHTML=""
+      list.forEach(ticket=>{
+        const row= document.createElement("tr")
+        const  userName= document.createElement("td")
+        const  plan= document.createElement("td")
+        const  id= document.createElement("td")
+        userName.innerHTML=ticket.user.userName;
+        plan.innerHTML=ticket.plan
+        id.innerHTML=ticket.number
+        row.appendChild(userName)
+        row.appendChild(plan)
+        row.appendChild(id)
+        ticketsTbody.appendChild(row)
+      })
+     }
+     populateUsersList(paginate(usersFilteredList,currentUsersPage))
+     populateTicketsList(paginate(ticketsFilteredList,currentTicketsPage))
+    usersFilter.addEventListener("change",(e)=>{
+      usersFilteredList=allUsers.filter(usersFilterFunctions[e.target.value])
+      noOfUsers.innerHTML=`(${usersFilteredList.length})`
+     populateUsersList(paginate(usersFilteredList,currentUsersPage))
+      
+    })
+
+    ticketsFilter.addEventListener("change",(e)=>{
+      
+      ticketsFilteredList=allTickets.filter(ticketFilterFunctions[e.target.value])
+      noOfTickets.innerHTML=`(${ticketsFilteredList.length})`
+      populateTicketsList(paginate(ticketsFilteredList,currentTicketsPage))
+    })
+
+    usersPrevPageBtn.onclick=()=>{
+if(currentUsersPage>1){
+  currentUsersPage=currentUsersPage-1
+  usersPageNo.innerHTML=currentUsersPage
+  populateUsersList(paginate(usersFilteredList,currentUsersPage))
+}
+else{
+  alert("There is no previous page")
+}
+  }
+
+    ticketsPrevPageBtn.onclick=()=>{
+if(currentTicketsPage>1){
+  currentTicketsPage=currentTicketsPage-1
+  ticketsPageNo.innerHTML=currentTicketsPage
+  populateTicketsList(paginate(ticketsFilteredList,currentTicketsPage))
+  
+}
+else{
+  alert("There is no previous page")
+}
+  }
+  ticketsNextPageBtn.onclick=()=>{
+    let max_pages=Math.floor(ticketsFilteredList.length/itemsPerPage)
+    
+    if((ticketsFilteredList.length%itemsPerPage)>0){
+      max_pages=max_pages+1;
+    } 
+    
+    if(currentTicketsPage<max_pages){
+    
+      currentTicketsPage= currentTicketsPage+1
+      ticketsPageNo.innerHTML=currentTicketsPage
+      populateTicketsList(paginate(ticketsFilteredList,currentTicketsPage))
+    }
+    else{
+      alert("Already reached last page")
+    }
+
+  }
+
+  usersNextPageBtn.onclick=()=>{
+    let max_pages=Math.floor(usersFilteredList.length/itemsPerPage)
+    if((usersFilteredList.length%itemsPerPage)>0){
+      max_pages=max_pages+1;
+    } 
+        if(currentUsersPage<max_pages){
+      currentUsersPage= currentUsersPage+1
+      usersPageNo.innerHTML=currentUsersPage
+      populateUsersList(paginate(usersFilteredList,currentUsersPage))
+    }
+    else{
+      alert("Already reached last page")
+    }
+
+  }
+ 
+
+  
+
+      }
+      
+      else{
+        alert("Unable to fetch data reload page ?")
+        window.location.reload()
+      }
+    })
+
+    
+
+</script>
+</body>
+</html>

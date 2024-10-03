@@ -12,7 +12,7 @@ const ticketSchema=  Schema({
     },
     plan:{
         type:String,
-        enum:["allAccess","exclusive","special"],
+        enum:["allAccess","exclusive","vip"],
         required:true
     }
 },{timestamps:true})

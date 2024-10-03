@@ -5,7 +5,7 @@ import sendMail from "../sendMail.js"
 
 const register= async(req,res,next)=>{
 const plan= req.body.package
-const link= plan==="exlusive"?"https://chat.whatsapp.com/BgbY0xZFdx97BFZobIlgfZ":"https://chat.whatsapp.com/I44ChddVgqsLKtGv9wCf4F"
+const link= plan==="exclusive"?"https://chat.whatsapp.com/BgbY0xZFdx97BFZobIlgfZ":"https://chat.whatsapp.com/I44ChddVgqsLKtGv9wCf4F"
     try {
     const newUser= await userModel.create(req.body)
     const number= await generateTicket()

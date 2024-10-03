@@ -10,7 +10,7 @@ try{
     const number= await generateTicket()
     const thisUser= await userModel.findById(id)
     const newTicket= await ticketModel.create({user:thisUser._id,plan,number})
-    await sendMail(thisUser.email,number, thisUser.userName)
+    await sendMail(thisUser.email,number, thisUser.userName,plan)
     const  updatedUser= await  userModel.findByIdAndUpdate(id,{$set:{ticket:newTicket._id}})
     
     return res.status(200).json({success:true, result:"done"})

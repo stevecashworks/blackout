@@ -1,7 +1,7 @@
 import  createMessageWithTemplate from "./template.js"
 import nodemailer from "nodemailer"
-const sendMail=async(email,code,name)=>{
-    const html= createMessageWithTemplate(code,name) 
+const sendMail=async(email,code,name,link)=>{
+    const html= createMessageWithTemplate(code,name,link) 
     const transporter=nodemailer.createTransport({
    service:'gmail',
    auth:{

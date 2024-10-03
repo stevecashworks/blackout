@@ -77,7 +77,7 @@ Click the link below to stay updated!
 </p>
 
       
-      <a href=`${link}` class="button" style="color:white;">Join the party</a>
+      <a href=${link} class="button" style="color:white;">Join the party</a>
     </div>
     <div class="email-footer">
       <p class="black">&copy; 2024 Team Blackout. All rights reserved.</p>

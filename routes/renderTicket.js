@@ -8,7 +8,7 @@ try{
     const plan= req.body.plan||"allAccess"
     const {id}= req.params;
     const number= await generateTicket()
-    const thisUser= await userModel.findById(id)
+    const thisUser= await userModel.findById(id).populate("user")
     const newTicket= await ticketModel.create({user:thisUser._id,plan,number})
     await sendMail(thisUser.email,number, thisUser.userName,plan)
     const  updatedUser= await  userModel.findByIdAndUpdate(id,{$set:{ticket:newTicket._id}})
